@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using node_socks.SOCKS.Types;
 
 namespace node_socks;
 
@@ -19,7 +20,6 @@ public class SOCKS4
         var sendBuffer = new byte[8];
         sendBuffer[0] = 0x00;
         sendBuffer[1] = 0x5A;
-        Array.Copy(buffer, 2, sendBuffer, 2, 6);
         var port = buffer[2] * 256 + buffer[3];
         var ip = string.Empty;
         for (var i = 4; i < 8; i++)
@@ -32,8 +32,11 @@ public class SOCKS4
         {
             Console.WriteLine("Incorrect Username"); // handle later
         }
+
+        var test = IPAddress.Parse(ip);
+        Console.WriteLine(test + ":" + port);
         
-        await Task.WhenAny(remoteClient.ConnectAsync(IPAddress.Parse(ip), port), Task.Delay(500));
+        await Task.WhenAny(remoteClient.ConnectAsync(test, port), Task.Delay(500));
         if (!remoteClient.Connected)
         {
             Console.WriteLine("Failed to connect to remote host."); // handle later

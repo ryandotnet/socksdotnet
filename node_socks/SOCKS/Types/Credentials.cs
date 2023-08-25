@@ -1,4 +1,4 @@
-namespace node_socks;
+namespace node_socks.SOCKS.Types;
 
 internal class Credentials
 {

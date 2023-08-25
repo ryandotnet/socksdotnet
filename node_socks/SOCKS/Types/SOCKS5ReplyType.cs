@@ -1,6 +1,6 @@
-namespace node_socks;
+namespace node_socks.SOCKS.Types;
 
-internal enum ReplyType
+internal enum SOCKS5ReplyType
 {
     Success = 0x00,
     Failure = 0x01,

@@ -1,4 +1,6 @@
 using System.Net.Sockets;
+using node_socks.SOCKS;
+using node_socks.SOCKS.Types;
 
 namespace node_socks;
 
