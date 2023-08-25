@@ -13,6 +13,11 @@ public class Request
         switch ((HeaderType)buffer[0])
         {
             case HeaderType.SOCKS4:
+                if (buffer[4] is 0)
+                {
+                    Console.WriteLine("SOCKS4a Client Found");
+                    return await SOCKS4a.Auth(localClient, remoteClient, buffer);
+                }
                 Console.WriteLine("Socks4 Client Found");
                 return await SOCKS4.Auth(localClient, remoteClient, buffer);
             case HeaderType.SOCKS5:

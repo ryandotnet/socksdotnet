@@ -50,8 +50,8 @@ internal class Server
         int bytes;
         var buffer = new byte[32768];
 
-        using var localStream = localClient.GetStream();
-        using var remoteStream = remoteClient.GetStream();
+        await using var localStream = localClient.GetStream();
+        await using var remoteStream = remoteClient.GetStream();
         do
         {
             bytes = await localStream.ReadAsync(buffer);
