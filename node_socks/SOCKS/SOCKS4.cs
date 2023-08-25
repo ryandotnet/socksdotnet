@@ -10,7 +10,7 @@ public class SOCKS4
     {
         var localStream = localClient.GetStream();
 
-        if ((CommandTypes)buffer[1] is not CommandTypes.Connect)
+        if ((CommandType)buffer[1] is not CommandType.Connect)
         {
             Console.WriteLine("Only CONNECT is supported"); // handle later
             return false;
@@ -25,6 +25,11 @@ public class SOCKS4
         for (var i = 4; i < 8; i++)
         {
             ip += buffer[i] + (i != 7 ? "." : "");
+        }
+
+        if (buffer[4] is 0)
+        {
+            Console.WriteLine("DNS Resolution Required");
         }
 
         var username = Encoding.ASCII.GetString(buffer, 8, 13);
