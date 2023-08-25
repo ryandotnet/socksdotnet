@@ -84,7 +84,7 @@ internal enum Methods
     NoSupport = 0xFF
 }
 
-public class SOCKS
+public class SOCKS5
 {
     internal async Task<(bool, IPAddress, int)> Authenticate(TcpClient localClient)
     {
@@ -93,19 +93,14 @@ public class SOCKS
         var receiveBuffer = new byte[257];
 
         await localStream.ReadAsync(receiveBuffer);
-        if (receiveBuffer[0] is not Methods.UserPass)
+        switch ((Headers)receiveBuffer[0])
         {
-            // Incorrect SOCKS version.
-            return (false, IPAddress.None, 0);
-        }
-
-        var methodCount = Convert.ToInt32(receiveBuffer[1]);
-        for (var i = 2; i < methodCount + 2; i++)
-        {
-            if (receiveBuffer[i] is 0x02)
-            {
-                
-            }
+            case Headers.SOCKS4:
+                break;
+            case Headers.SOCKS5:
+                break;
+            default:
+                return (false, IPAddress.None, 0);
         }
     }
 }
