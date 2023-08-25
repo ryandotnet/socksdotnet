@@ -5,9 +5,9 @@ namespace node_socks;
 
 internal class Server
 {
-    internal async Task StartServer()
+    internal static async Task StartServer()
     {
-        var listener = new TcpListener(IPAddress.Any, 1709)
+        var listener = new TcpListener(IPAddress.Loopback, 1709)
         {
             Server =
             {
@@ -17,14 +17,45 @@ internal class Server
             }
         };
         listener.Start();
+        Console.WriteLine("Listening on: " + listener.LocalEndpoint);
         await AcceptClientAsync(listener);
     }
 
-    private async Task AcceptClientAsync(TcpListener listener)
+    private static async Task AcceptClientAsync(TcpListener listener)
     {
-        var localClient = new TcpClient() { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
-        var remoteClient = new TcpClient() { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
+        try
+        {
+            var localClient = new TcpClient() { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
+            var remoteClient = new TcpClient() { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
 
-        localClient = await listener.AcceptTcpClientAsync();
+            localClient = await listener.AcceptTcpClientAsync();
+            if (await Request.Negotiate(localClient, remoteClient))
+            {
+                _ = Task.Run(async () => await ExchangeDataAsync(localClient, remoteClient));
+                _ = Task.Run(async () => await ExchangeDataAsync(remoteClient, localClient));
+            }
+        }
+        catch
+        {
+            throw;
+        }
+        finally
+        {
+            await AcceptClientAsync(listener);
+        }
+    }
+    
+    private static async Task ExchangeDataAsync(TcpClient localClient, TcpClient remoteClient)
+    {
+        int bytes;
+        var buffer = new byte[32768];
+
+        using var localStream = localClient.GetStream();
+        using var remoteStream = remoteClient.GetStream();
+        do
+        {
+            bytes = await localStream.ReadAsync(buffer);
+            await remoteStream.WriteAsync(buffer.AsMemory(0, bytes));
+        } while (bytes is not 0);
     }
 }
