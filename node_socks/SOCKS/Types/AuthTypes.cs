@@ -1,6 +1,6 @@
 namespace node_socks.SOCKS.Types;
 
-internal enum AuthType
+internal enum AuthTypes
 {
     None = 0x00,
     GSSApi = 0x01,

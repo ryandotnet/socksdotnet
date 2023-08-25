@@ -1,6 +1,6 @@
 namespace node_socks.SOCKS.Types;
 
-internal enum HeaderType
+internal enum HeaderTypes
 {
     Generic = 0x00,
     SOCKS4 = 0x04,

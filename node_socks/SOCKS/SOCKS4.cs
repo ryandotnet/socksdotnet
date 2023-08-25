@@ -11,7 +11,7 @@ public class SOCKS4
     {
         var localStream = localClient.GetStream();
 
-        if ((CommandType)buffer[1] is not CommandType.Connect)
+        if ((CommandTypes)buffer[1] is not CommandTypes.Connect)
         {
             Console.WriteLine("Only CONNECT is supported"); // handle later
             return false;

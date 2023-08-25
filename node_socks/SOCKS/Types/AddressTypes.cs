@@ -1,6 +1,6 @@
 namespace node_socks.SOCKS.Types;
 
-internal enum AddressType
+internal enum AddressTypes
 {
     IPv4 = 0x01,
     DomainName = 0x03,
