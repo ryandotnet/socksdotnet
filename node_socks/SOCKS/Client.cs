@@ -25,4 +25,10 @@ public class Client
         };
         await localStream.WriteAsync(new[] { (byte)HeaderType.Generic, (byte)result });
     }
+
+    internal static async Task HandleSOCKS4Request(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
+    {
+        var result = await SOCKS4.Negotiate(localClient, remoteClient, buffer);
+        await 
+    }
 }

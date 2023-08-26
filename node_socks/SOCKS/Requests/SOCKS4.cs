@@ -7,7 +7,7 @@ namespace node_socks;
 
 internal class SOCKS4
 {
-    internal static async Task<SOCKS4ReplyType> Handshake(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
+    internal static async Task<SOCKS4ReplyType> Negotiate(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
     {
         if ((CommandType)buffer[1] is not CommandType.Connect)
         {
