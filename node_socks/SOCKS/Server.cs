@@ -5,9 +5,11 @@ namespace node_socks;
 
 internal class Server
 {
+    internal static string IP { private get; set; }
+    internal static int Port { private get; set; }
     internal static async Task StartServer()
     {
-        var listener = new TcpListener(IPAddress.Loopback, 1709)
+        var listener = new TcpListener(IPAddress.Parse(IP), Port)
         {
             Server =
             {
@@ -16,8 +18,10 @@ internal class Server
                 NoDelay = true
             }
         };
+        
         listener.Start();
         Console.WriteLine("Listening on: " + listener.LocalEndpoint);
+        
         await HandleClient(listener);
     }
 
@@ -36,7 +40,6 @@ internal class Server
                 _ = Task.Run(async () => await ExchangeData(remote, client));
             }
         }
-
         finally
         {
             await HandleClient(listener);
