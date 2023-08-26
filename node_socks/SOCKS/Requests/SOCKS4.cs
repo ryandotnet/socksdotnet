@@ -5,17 +5,14 @@ using node_socks.SOCKS.Types;
 
 namespace node_socks;
 
-public class SOCKS4
+internal class SOCKS4
 {
-    internal static async Task<bool> Auth(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
+    internal static async Task<SOCKS4ReplyType> Handshake(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
     {
-        var localStream = localClient.GetStream();
-        
         if ((CommandType)buffer[1] is not CommandType.Connect)
         {
             Console.WriteLine("BIND command not supported.");
-            await localStream.WriteAsync(new[] { (byte)HeaderType.Generic, (byte)SOCKS4ReplyType.Failure });
-            return false;
+            return SOCKS4ReplyType.Failure;
         }
 
         var index = 0;
@@ -28,19 +25,14 @@ public class SOCKS4
             {
                 index++;
                 break;
-            } 
+            }
             username += Encoding.ASCII.GetString(new[] { buffer[index] });
         }
 
         if (!Credentials.ValidateSOCKS4(username))
         {
             Console.WriteLine("Incorrect Credentials.");
-            await localStream.WriteAsync(new[]
-            {
-                (byte)HeaderType.Generic, 
-                (byte)SOCKS4ReplyType.BadCredentials
-            });
-            return false;
+            return SOCKS4ReplyType.BadCredentials;
         }
 
         if (ip.ToString().StartsWith("0.0.0."))
@@ -54,20 +46,10 @@ public class SOCKS4
         if (!remoteClient.Connected)
         {
             Console.WriteLine("Failed to connect to remote host.");
-            await localStream.WriteAsync(new[]
-            {
-                (byte)HeaderType.Generic,
-                (byte)SOCKS4ReplyType.HostUnreachable
-            });
-            return false;
+            return SOCKS4ReplyType.HostUnreachable;
         }
-
-        await localStream.WriteAsync(new byte[] 
-        { 
-            (byte)HeaderType.Generic, 
-            (byte)SOCKS4ReplyType.Success, 
-            0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
-        });
-        return true;
+        
+        Console.WriteLine("I'm Gay!");
+        return SOCKS4ReplyType.Success;
     }
 }

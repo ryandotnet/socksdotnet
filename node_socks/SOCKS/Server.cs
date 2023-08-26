@@ -19,31 +19,23 @@ internal class Server
         };
         listener.Start();
         Console.WriteLine("Listening on: " + listener.LocalEndpoint);
-        await AcceptClientAsync(listener);
+        while (true)
+        {
+            var client = await listener.AcceptTcpClientAsync(); 
+            {
+                client.ReceiveBufferSize = 32768;
+                client.SendBufferSize = 32768;
+                client.NoDelay = true;
+            }
+            _ = Task.Run(async () => await HandleClient(client));
+        }
     }
 
-    private static async Task AcceptClientAsync(TcpListener listener)
+    private static async Task HandleClient(TcpClient client)
     {
-        try
-        {
-            var localClient = new TcpClient() { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
-            var remoteClient = new TcpClient() { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
+        var remote = new TcpClient { ReceiveBufferSize = 32768, SendBufferSize = 32768, NoDelay = true };
 
-            localClient = await listener.AcceptTcpClientAsync();
-            if (await Request.Negotiate(localClient, remoteClient))
-            {
-                _ = Task.Run(async () => await ExchangeDataAsync(localClient, remoteClient));
-                _ = Task.Run(async () => await ExchangeDataAsync(remoteClient, localClient));
-            }
-        }
-        catch
-        {
-            throw;
-        }
-        finally
-        {
-            await AcceptClientAsync(listener);
-        }
+        await Client.ParseRequest(client, remote);
     }
     
     private static async Task ExchangeDataAsync(TcpClient localClient, TcpClient remoteClient)
