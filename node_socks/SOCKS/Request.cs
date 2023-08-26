@@ -15,7 +15,6 @@ public class Request
         switch ((HeaderType)buffer[0])
         {
             case HeaderType.SOCKS4:
-                Console.WriteLine("Socks4 Client Found");
                 return await SOCKS4.Auth(localClient, remoteClient, buffer);
             case HeaderType.SOCKS5:
                 return false;

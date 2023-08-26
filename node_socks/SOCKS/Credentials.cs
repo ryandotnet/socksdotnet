@@ -13,6 +13,7 @@ internal class Credentials
     
     internal static bool ValidateSOCKS4(string username)
     {
+        Username = "hachimitsupan";
         return username.Equals(Username);
     }
 }
