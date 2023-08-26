@@ -9,7 +9,7 @@ internal enum SOCKS5ReplyType
     HostUnreachable = 0x04,
     Refused = 0x05,
     Expired = 0x06,
-    NotSupported = 0x07,
+    CommandNotSupported = 0x07,
     AddressNotSupported = 0x08,
-    AuthNotSupported = 0xFF
+    AuthNotSupported = 0xFF,
 }

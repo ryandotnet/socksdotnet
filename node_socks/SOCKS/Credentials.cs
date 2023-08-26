@@ -8,6 +8,8 @@ internal class Credentials
 
     internal static bool ValidateSOCKS5(string username, string password)
     {
+        Username = "hachimitsupan";
+        Password = "Gamemaster11";
         return username.Equals(Username) && password.Equals(Password);
     }
     

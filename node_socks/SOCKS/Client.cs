@@ -1,34 +1,59 @@
 using System.Net.Sockets;
-using node_socks.SOCKS;
+using node_socks.SOCKS.Requests;
 using node_socks.SOCKS.Types;
 
 namespace node_socks;
 
 public class Client
 {
-    internal static async Task ParseRequest(TcpClient localClient, TcpClient remoteClient)
+    internal static async Task<bool> ParseRequest(TcpClient client, TcpClient remote)
     {
-        var localStream = localClient.GetStream();
+        var clientStream = client.GetStream();
         var buffer = new byte[256];
-        var result = SOCKS4ReplyType.Success;
-
-        await localStream.ReadAsync(buffer);
+        
+        await clientStream.ReadAsync(buffer);
+        
         switch ((HeaderType)buffer[0])
         {
             case HeaderType.SOCKS4:
             {
-                result = await SOCKS4.Auth(localClient, remoteClient, buffer);
-                break;
+                var reply = await SOCKS4.HandleRequest(client, remote, buffer);
+                return await ReplySOCKS4(clientStream, reply);
+                
             }
             case HeaderType.SOCKS5:
-                break;
-        };
-        await localStream.WriteAsync(new[] { (byte)HeaderType.Generic, (byte)result });
+            {
+                var reply = await SOCKS5.Handshake(client, remote, buffer);
+                return await ReplySOCKS5(clientStream, reply);
+            }
+            default:
+                return false;
+        }
     }
 
-    internal static async Task HandleSOCKS4Request(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
+    private static async Task<bool> ReplySOCKS4(Stream clientStream, SOCKS4ReplyType reply)
     {
-        var result = await SOCKS4.Negotiate(localClient, remoteClient, buffer);
-        await 
+        await clientStream.WriteAsync(new byte[]
+        {
+            (byte)HeaderType.Generic, 
+            (byte)reply, 
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
+        });
+        
+        return reply is SOCKS4ReplyType.Success;
+    }
+    
+    private static async Task<bool> ReplySOCKS5(Stream clientStream, SOCKS5ReplyType reply)
+    {
+        await clientStream.WriteAsync(new byte[]
+        {
+            (byte)HeaderType.SOCKS5, 
+            (byte)reply, 
+            0x00,
+            (byte)AddressType.IPv4,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
+        });
+        
+        return reply is SOCKS5ReplyType.Success;
     }
 }

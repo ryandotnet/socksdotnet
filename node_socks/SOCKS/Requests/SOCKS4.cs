@@ -3,11 +3,11 @@ using System.Net.Sockets;
 using System.Text;
 using node_socks.SOCKS.Types;
 
-namespace node_socks;
+namespace node_socks.SOCKS.Requests;
 
 internal class SOCKS4
 {
-    internal static async Task<SOCKS4ReplyType> Negotiate(TcpClient localClient, TcpClient remoteClient, byte[] buffer)
+    internal static async Task<SOCKS4ReplyType> HandleRequest(TcpClient client, TcpClient remote, byte[] buffer)
     {
         if ((CommandType)buffer[1] is not CommandType.Connect)
         {
@@ -41,15 +41,15 @@ internal class SOCKS4
             var lookup = await Dns.GetHostAddressesAsync(domain, AddressFamily.InterNetwork);
             ip = lookup.First();
         }
-        
-        await Task.WhenAny(remoteClient.ConnectAsync(ip, port), Task.Delay(500));
-        if (!remoteClient.Connected)
+
+        await Task.WhenAny(remote.ConnectAsync(ip, port), Task.Delay(500));
+        if (!remote.Connected)
         {
             Console.WriteLine("Failed to connect to remote host.");
             return SOCKS4ReplyType.HostUnreachable;
         }
         
-        Console.WriteLine("I'm Gay!");
+        Console.WriteLine("{0} <--> {1}:{2}", client.Client.RemoteEndPoint, ip, port);
         return SOCKS4ReplyType.Success;
     }
 }
