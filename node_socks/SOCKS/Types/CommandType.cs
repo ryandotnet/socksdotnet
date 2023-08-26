@@ -1,6 +1,6 @@
 namespace node_socks.SOCKS.Types;
 
-internal enum CommandTypes
+internal enum CommandType
 {
     Connect = 0x01,
     Bind = 0x02,

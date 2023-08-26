@@ -11,10 +11,10 @@ internal class SOCKS4a
     {
         var localStream = localClient.GetStream();
         
-        if ((CommandTypes)buffer[1] is not CommandTypes.Connect)
+        if ((CommandType)buffer[1] is not CommandType.Connect)
         {
             Console.WriteLine("BIND command not supported.");
-            await localStream.WriteAsync(new[] { (byte)HeaderTypes.Generic, (byte)SOCKS4ReplyType.Failure });
+            await localStream.WriteAsync(new[] { (byte)HeaderType.Generic, (byte)SOCKS4ReplyType.Failure });
             return false;
         }
 
@@ -36,7 +36,7 @@ internal class SOCKS4a
             Console.WriteLine("Incorrect Credentials.");
             await localStream.WriteAsync(new[]
             {
-                (byte)HeaderTypes.Generic, 
+                (byte)HeaderType.Generic, 
                 (byte)SOCKS4ReplyType.BadCredentials
             });
             return false;
@@ -52,7 +52,7 @@ internal class SOCKS4a
             Console.WriteLine("Failed to connect to remote host.");
             await localStream.WriteAsync(new[]
             {
-                (byte)HeaderTypes.Generic,
+                (byte)HeaderType.Generic,
                 (byte)SOCKS4ReplyType.HostUnreachable
             });
             return false;
@@ -60,7 +60,7 @@ internal class SOCKS4a
 
         await localStream.WriteAsync(new byte[] 
         { 
-            (byte)HeaderTypes.Generic, 
+            (byte)HeaderType.Generic, 
             (byte)SOCKS4ReplyType.Success, 
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00 
         });

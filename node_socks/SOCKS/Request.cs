@@ -12,17 +12,12 @@ public class Request
         var buffer = new byte[257];
 
         await localStream.ReadAsync(buffer);
-        switch ((HeaderTypes)buffer[0])
+        switch ((HeaderType)buffer[0])
         {
-            case HeaderTypes.SOCKS4:
-                if (buffer[4] is 0)
-                {
-                    Console.WriteLine("SOCKS4a Client Found");
-                    return await SOCKS4a.Auth(localClient, remoteClient, buffer);
-                }
+            case HeaderType.SOCKS4:
                 Console.WriteLine("Socks4 Client Found");
                 return await SOCKS4.Auth(localClient, remoteClient, buffer);
-            case HeaderTypes.SOCKS5:
+            case HeaderType.SOCKS5:
                 return false;
             default:
                 return false;
