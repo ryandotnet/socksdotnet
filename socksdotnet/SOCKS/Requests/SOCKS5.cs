@@ -1,9 +1,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using node_socks.SOCKS.Types;
+using socksdotnet.SOCKS.Types;
 
-namespace node_socks.SOCKS.Requests;
+namespace socksdotnet.SOCKS.Requests;
 
 internal class SOCKS5
 {

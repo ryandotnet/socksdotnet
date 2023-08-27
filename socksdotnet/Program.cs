@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using node_socks;
+﻿using socksdotnet.SOCKS;
+
+namespace socksdotnet;
 
 internal class Program
 {
@@ -8,6 +9,7 @@ internal class Program
         if (args.Length is 0)
         {
             Console.WriteLine("Please specify a valid config file.");
+            return;
         }
         
         if (args[0].Contains(".json"))

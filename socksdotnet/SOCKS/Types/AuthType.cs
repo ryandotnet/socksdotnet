@@ -1,4 +1,4 @@
-namespace node_socks.SOCKS.Types;
+namespace socksdotnet.SOCKS.Types;
 
 internal enum AuthType
 {

@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Configuration;
-using node_socks.SOCKS.Types;
+using socksdotnet.SOCKS;
 
-namespace node_socks;
+namespace socksdotnet;
 
-public class Configuration
+internal class Configuration
 {
     internal static bool Load(string filePath)
     {

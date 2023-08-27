@@ -1,10 +1,10 @@
 using System.Net.Sockets;
-using node_socks.SOCKS.Requests;
-using node_socks.SOCKS.Types;
+using socksdotnet.SOCKS.Requests;
+using socksdotnet.SOCKS.Types;
 
-namespace node_socks;
+namespace socksdotnet.SOCKS;
 
-public class Client
+internal class Client
 {
     internal static async Task<bool> ParseRequest(TcpClient client, TcpClient remote)
     {

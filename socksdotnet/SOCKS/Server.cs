@@ -1,11 +1,11 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace node_socks;
+namespace socksdotnet.SOCKS;
 
 internal class Server
 {
-    internal static string IP { private get; set; }
+    internal static string? IP { private get; set; }
     internal static int Port { private get; set; }
     internal static async Task StartServer()
     {
