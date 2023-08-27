@@ -32,7 +32,7 @@ internal class SOCKS5
         if ((HeaderType)buffer[0] is not HeaderType.UserPass)
         {
             Console.WriteLine("Incorrect authentication method.");
-            return SOCKS5ReplyType.Failure;
+            return SOCKS5ReplyType.BadAuthType;
         }
         
         var usernameLength = buffer[1];
@@ -43,7 +43,7 @@ internal class SOCKS5
         if (!Credentials.ValidateSOCKS5(username, password))
         {
             Console.WriteLine("Incorrect credentials.");
-            return SOCKS5ReplyType.Failure;
+            return SOCKS5ReplyType.BadCredentials;
         }
 
         await clientStream.WriteAsync(new[] { (byte)HeaderType.UserPass, (byte)SOCKS5ReplyType.Success });
@@ -79,12 +79,22 @@ internal class SOCKS5
             }
             case AddressType.DomainName:
             {
-                var domain = Encoding.ASCII.GetString(buffer, 5, buffer[4]);
-                var lookup = await Dns.GetHostAddressesAsync(domain, AddressFamily.InterNetwork);
-                var portIndex = 5 + buffer[4];
-                ip = lookup.First();
-                port = buffer[portIndex] * 256 + buffer[portIndex + 1];
-                break;
+                Console.WriteLine("test 1");
+                try
+                {
+                    var domain = Encoding.ASCII.GetString(buffer, 5, buffer[4]);
+                    var lookup = await Dns.GetHostAddressesAsync(domain, AddressFamily.InterNetwork);
+                    var portIndex = 5 + buffer[4];
+                    ip = lookup.First();
+                    port = buffer[portIndex] * 256 + buffer[portIndex + 1];
+                    Console.WriteLine("test 2");
+                    break;
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine(error);
+                    return SOCKS5ReplyType.HostUnreachable;
+                }
             }
             case AddressType.IPv6:
             {
@@ -98,6 +108,7 @@ internal class SOCKS5
             }
         }
 
+        Console.WriteLine("test 3");
         await Task.WhenAny(remote.ConnectAsync(ip, port), Task.Delay(500));
         if (!remote.Connected)
         {

@@ -45,38 +45,35 @@ public class Client
     
     private static async Task<bool> ReplySOCKS5(Stream clientStream, SOCKS5ReplyType reply)
     {
+        var buffer = new byte[]
+        {
+            (byte)HeaderType.SOCKS5,
+            (byte)reply,
+            0x00,
+            (byte)AddressType.IPv4,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+        };
+   
         switch (reply)
         {
             case SOCKS5ReplyType.Success:
             {
-                await clientStream.WriteAsync(new byte[]
-                {
-                    (byte)HeaderType.SOCKS5,
-                    (byte)reply,
-                    0x00,
-                    (byte)AddressType.IPv4,
-                    0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-                });
-                
+                await clientStream.WriteAsync(buffer);
                 return true;
             }
-            case SOCKS5ReplyType.Failure:
+            case SOCKS5ReplyType.BadCredentials:
+            case SOCKS5ReplyType.BadAuthType:
             {
+                buffer[0] = (byte)HeaderType.UserPass;
+                await clientStream.WriteAsync(buffer);
                 return false;
             }
             case SOCKS5ReplyType.AuthNotSupported:
+            default:
             {
+                await clientStream.WriteAsync(buffer);
                 return false;
             }
-            case SOCKS5ReplyType.AuthNotSupported:
-            {
-                return false;
-            }
-            case SOCKS5ReplyType.AuthNotSupported:
-            {
-                return false;
-            }
-            
         }
     }
 }
