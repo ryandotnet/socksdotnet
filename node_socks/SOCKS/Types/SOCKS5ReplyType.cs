@@ -11,7 +11,6 @@ internal enum SOCKS5ReplyType
     Expired = 0x06,
     CommandNotSupported = 0x07,
     AddressNotSupported = 0x08,
-    BadCredentials = 0x09,
-    BadAuthType = 0x1A,
+    AuthFailed = 0x99,
     AuthNotSupported = 0xFF,
 }

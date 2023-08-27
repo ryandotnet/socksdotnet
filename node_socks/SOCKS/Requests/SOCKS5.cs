@@ -32,7 +32,7 @@ internal class SOCKS5
         if ((HeaderType)buffer[0] is not HeaderType.UserPass)
         {
             Console.WriteLine("Incorrect authentication method.");
-            return SOCKS5ReplyType.BadAuthType;
+            return SOCKS5ReplyType.AuthFailed;
         }
         
         var usernameLength = buffer[1];
@@ -43,7 +43,7 @@ internal class SOCKS5
         if (!Credentials.ValidateSOCKS5(username, password))
         {
             Console.WriteLine("Incorrect credentials.");
-            return SOCKS5ReplyType.BadCredentials;
+            return SOCKS5ReplyType.AuthFailed;
         }
 
         await clientStream.WriteAsync(new[] { (byte)HeaderType.UserPass, (byte)SOCKS5ReplyType.Success });

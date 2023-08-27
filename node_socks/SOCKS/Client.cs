@@ -53,27 +53,18 @@ public class Client
             (byte)AddressType.IPv4,
             0x00, 0x00, 0x00, 0x00, 0x00, 0x00
         };
-   
+
         switch (reply)
         {
             case SOCKS5ReplyType.Success:
-            {
                 await clientStream.WriteAsync(buffer);
                 return true;
-            }
-            case SOCKS5ReplyType.BadCredentials:
-            case SOCKS5ReplyType.BadAuthType:
-            {
+            case SOCKS5ReplyType.AuthFailed:
                 buffer[0] = (byte)HeaderType.UserPass;
-                await clientStream.WriteAsync(buffer);
-                return false;
-            }
-            case SOCKS5ReplyType.AuthNotSupported:
-            default:
-            {
-                await clientStream.WriteAsync(buffer);
-                return false;
-            }
+                break;
         }
+
+        await clientStream.WriteAsync(buffer);
+        return false;
     }
 }
