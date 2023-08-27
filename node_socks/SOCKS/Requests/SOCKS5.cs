@@ -79,22 +79,20 @@ internal class SOCKS5
             }
             case AddressType.DomainName:
             {
-                Console.WriteLine("test 1");
-                try
+                var portIndex = 5 + buffer[4];
+                var domain = Encoding.ASCII.GetString(buffer, 5, buffer[4]);
+                
+                var lookup = Dns.GetHostAddressesAsync(domain, AddressFamily.InterNetwork);
+                await Task.WhenAny(lookup, Task.Delay(500));
+                if (lookup.Status is not TaskStatus.RanToCompletion)
                 {
-                    var domain = Encoding.ASCII.GetString(buffer, 5, buffer[4]);
-                    var lookup = await Dns.GetHostAddressesAsync(domain, AddressFamily.InterNetwork);
-                    var portIndex = 5 + buffer[4];
-                    ip = lookup.First();
-                    port = buffer[portIndex] * 256 + buffer[portIndex + 1];
-                    Console.WriteLine("test 2");
-                    break;
-                }
-                catch (Exception error)
-                {
-                    Console.WriteLine(error);
+                    Console.WriteLine("Failed to resolve hostname.");
                     return SOCKS5ReplyType.HostUnreachable;
                 }
+
+                ip = lookup.Result.First();
+                port = buffer[portIndex] * 256 + buffer[portIndex + 1];
+                break;
             }
             case AddressType.IPv6:
             {
@@ -108,7 +106,6 @@ internal class SOCKS5
             }
         }
 
-        Console.WriteLine("test 3");
         await Task.WhenAny(remote.ConnectAsync(ip, port), Task.Delay(500));
         if (!remote.Connected)
         {
