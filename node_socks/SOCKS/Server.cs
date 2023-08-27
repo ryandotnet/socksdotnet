@@ -34,11 +34,15 @@ internal class Server
 
             client = await listener.AcceptTcpClientAsync();
 
-            if (await Client.ParseRequest(client, remote))
+            if (!await Client.ParseRequest(client, remote))
             {
-                _ = Task.Run(async () => await ExchangeData(client, remote));
-                _ = Task.Run(async () => await ExchangeData(remote, client));
+                client.Dispose();
+                remote.Dispose();
+                return;
             }
+            
+            _ = Task.Run(async () => await ExchangeData(client, remote));
+            _ = Task.Run(async () => await ExchangeData(remote, client));
         }
         finally
         {
